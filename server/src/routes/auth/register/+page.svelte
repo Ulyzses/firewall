@@ -1,13 +1,16 @@
-<form method="POST" action="?/login">
+<form method="POST" action="?/signup">
 	<label>
 		Email
 		<input name="email" type="email" />
 	</label>
 	<label>
+		Username
+		<input name="username" type="text" />
+	</label>
+	<label>
 		Password
 		<input name="password" type="password" />
 	</label>
-	<button>Login</button>
+	<button>Register</button>
 	<button formaction="?/oauth">Sign in with Google</button>
-	<a href="/auth/register">Register a new account</a>
 </form>
