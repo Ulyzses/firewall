@@ -1,4 +1,5 @@
 <script>
+	import "../app.css";
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
