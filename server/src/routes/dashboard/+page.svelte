@@ -1,23 +1,15 @@
 <script lang="ts">
-  type Device = {
+  interface Device {
+    id: number;
     name: string;
-    number: number;
-    status: string;
+    mac: string;
+    status: boolean;
     smoke: boolean;
-  };
-
-  let devices: Device[] = [
-    { name: 'pips', number: 202111579, status: 'on', smoke: true },
-    { name: 'lance', number: 201800866, status: 'on', smoke: false },
-    { name: 'julia', number: 202108595, status: 'forced off', smoke: false },
-    { name: 'renzo', number: 202100912, status: 'forced off', smoke: false },
-    { name: 'marius', number: 202102371, status: 'off', smoke: false },
-    { name: 'jaren', number: 202102804, status: 'off', smoke: false }
-  ];
+  }
 
   export let data;
 
-  $: ({ user, supabase } = data);
+  $: ({ user, supabase, devices } = data);
 
   let addDeviceForm: HTMLFormElement;
 
@@ -39,6 +31,25 @@
       console.log(data);
     }
   }
+
+  async function toggleDevice(device: Device) {
+    const { data, error } = await supabase
+      .from('actions')
+      .insert({
+        mac: device.mac,
+        action: device.status ? 'OFF' : 'ON'
+      })
+      .select();
+    
+    if (error) {
+      console.error(error);
+    } else {
+      console.log(data);
+    }
+
+    device.status = !device.status;
+    devices = devices;
+  }
 </script>
 
 <form bind:this={addDeviceForm} on:submit|preventDefault={addDevice}>
@@ -47,6 +58,19 @@
   </label>
   <button>Add Device</button>
 </form>
+
+{#each devices as device (device.id)}
+  <div>
+    <span>{device.id}</span>
+    <span>{device.name}</span>
+    <span>{device.mac}</span>
+    <span>{device.status}</span>
+    {#if device.smoke}
+      <span>Smoke Detected</span>
+    {/if}
+    <button on:click={() => toggleDevice(device)}>{device.status ? 'Turn Off' : 'Turn On'}</button>
+  </div>
+{/each}
 
 <!-- top bar -->
 <!-- FireWall name -->
