@@ -1,4 +1,3 @@
-
 // @ts-check
 import { join } from 'path';
 
@@ -37,4 +36,3 @@ export default {
     })
 	]
 }
-					
