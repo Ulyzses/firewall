@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import url(https://db.onlinewebfonts.com/c/63cf8985576a4aaa66f7c13c94dba716?family=Kollektif);
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
