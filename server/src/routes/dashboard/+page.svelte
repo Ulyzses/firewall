@@ -5,14 +5,14 @@
 
   const modalAddDevice: ModalSettings = {
     backdropClasses: '!backdrop-blur-md',
-	  modalClasses: '!bg-white',
+    modalClasses: '!bg-white',
     type: 'prompt',
     // Data
     title: 'Enter Device ID',
-    body: 'Provide the MAC address of your device below, e.g. 202111579, 202112345',
+    body: 'Provide the MAC address of your device below, e.g. 34:38:3a:45:37:3a',
     // Populates the input value and attributes
     value: '',
-    valueAttr: { type: 'text', minlength: 9, maxlength: 9, required: true },
+    valueAttr: { type: 'text', minlength: 17, maxlength: 17, required: true },
     // Returns the updated response value
     response: (r: string) => {
       addDeviceValue = r;
@@ -22,28 +22,19 @@
   
   let addDeviceValue = '';
 
-  const statusColors = ['bg-green-500', 'bg-orange-400', 'bg-firewall-red'];
-  const statusLabels = ['ON', 'FORCED OFF', 'OFF'];
+  const statusColors = ['bg-firewall-red', 'bg-green-500'];
+  const statusLabels = ['OFF', 'ON'];
               
-  type Device = {
+  interface Device {
     name: string;
-    id: number;
-    status: number;
+    mac: string;
+    status: boolean;
     smoke: boolean;
-  };
-
-  let devices: Device[] = [
-    { name: 'pips', id: 202111579, status: 0, smoke: true },
-    { name: 'lance', id: 201800866, status: 0, smoke: false },
-    { name: 'julia', id: 202108595, status: 1, smoke: false },
-    { name: 'renzo', id: 202100912, status: 1, smoke: false },
-    { name: 'marius', id: 202102371, status: 2, smoke: false },
-    { name: 'jaren', id: 202102804, status: 2, smoke: false }
-  ];
+  }
 
   export let data;
 
-  $: ({ user, supabase } = data);
+  $: ({ user, supabase, devices } = data);
 
   let addDeviceForm: HTMLFormElement;
 
@@ -68,6 +59,25 @@
       console.log(data);
     }
   }
+
+  async function toggleDevice(device: Device) {
+    const { data, error } = await supabase
+      .from('actions')
+      .insert({
+        mac: device.mac,
+        action: device.status ? 'OFF' : 'ON'
+      })
+      .select();
+    
+    if (error) {
+      console.error(error);
+    } else {
+      console.log(data);
+    }
+
+    device.status = !device.status;
+    devices = devices;
+  }
 </script>
 
 <nav class='grid grid-flow-row grid-cols-2 justify-between h-min w-auto mb-6 mx-6'>
@@ -91,12 +101,13 @@
       <p>plug img</p>
       <div class='h-auto w-1/4 grid grid-flow-cols justify-items-left justify-self-center'>
         <p class='w-min h-min'>{ device.name }</p>
-        <p class='w-min h-min'>{ device.id }</p>
+        <p class='w-min h-min'>{ device.mac }</p>
       </div>
-      <button class='h-full w-1/4 { statusColors[device.status] } text-white rounded-lg'>{ statusLabels[device.status] }</button>
+      <button class='h-full w-1/4 { statusColors[Number(device.status)] } text-white rounded-lg' on:click={() => toggleDevice(device)}>{ statusLabels[Number(device.status)] }</button>
     </div>
   {/each}
 </div>
+
 <!-- top bar -->
     <!-- FireWall name -->
     <!-- user icon -->
