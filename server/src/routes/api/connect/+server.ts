@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ request, locals: { supabase } }) =>
   }
 
   if (!data.length) {
-    return json({ error: 'Device not found' }, { status: 400 });
+    return json({ error: 'Device not found' }, { status: 404 });
   }
 
   return json({ message: 'Device is connected' })
