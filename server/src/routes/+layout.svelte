@@ -3,6 +3,9 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import { initializeStores, Modal } from '@skeletonlabs/skeleton';
+
+	initializeStores();
 
 	export let data;
 	$: ({ session, supabase } = data);
@@ -37,6 +40,8 @@
 		goto('/auth');
 	};
 </script>
+
+<Modal />
 
 {#if session}
 	<button on:click={logout}>Logout</button>
