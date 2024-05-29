@@ -2,37 +2,58 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 
 import nodemailer from 'nodemailer';
+
 import { PUBLIC_NODEMAILER_USER, PUBLIC_NODEMAILER_PASS } from '$env/static/public';
 
-export const POST: RequestHandler = async ({ request, locals: { supabase } }) => {
-  const body = await request.json();
+interface ActionsBody {
+  mac: string;
+  trigger: number;
+  state: number;
+}
 
-  const { mac, state } = body;
+export const POST: RequestHandler = async ({ request, locals: { supabase } }) => {
+  const body = await request.json() as ActionsBody;
+
+  const { mac, trigger, state } = body;
 
   if (!mac) {
     return json({ error: 'MAC Address is required' }, { status: 400 });
   }
 
-  if (!state) {
+  if (trigger === null || isNaN(trigger)) {
+    return json({ error: 'Trigger is required' }, { status: 400 });
+  }
+
+  if (state === null || isNaN(state)) {
     return json({ error: 'State is required' }, { status: 400 });
   }
 
-  const { data, error } = await supabase
+  const doesExist = await supabase
     .from('devices')
     .select(`*, profiles(email)`)
     .eq('mac', mac)
     .is('connected', true)
     .maybeSingle();
 
-  if (error) {
-    return json({ error: error.message }, { status: 500 });
+  if (doesExist.error) {
+    return json({ error: doesExist.error.message }, { status: 500 });
   }
 
-  if (!data) {
+  if (!doesExist.data) {
     return json({ error: 'Device not found' }, { status: 404 });
   }
 
-  const { profiles: { email } } = data;
+  const isSmoke = trigger === 0;
+  const isOn = state;
+
+  const { user, profiles: { email } } = doesExist.data;
+
+  const update = await supabase
+    .from('devices')
+    .update({ status: isOn, smoke: isSmoke })
+    .eq('mac', mac)
+    .eq('connected', true)
+    .eq('user', user);
 
   const transport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -49,12 +70,14 @@ export const POST: RequestHandler = async ({ request, locals: { supabase } }) =>
     subject: "FireWall Alert",
     html: `
       <h1>FireWall Alert</h1>
+      <p>Device: ${doesExist.data.name}</p>
       <p>MAC Address: ${mac}</p>
+      <p>Trigger: ${isSmoke ? 'Smoke' : 'Manual'}</p>
       <p>State: ${state}</p>
     `,
   });
 
   console.log("Message sent: %s", info.messageId);
   
-  return json(data);
+  return json({ message: 'Action completed' });
 }
