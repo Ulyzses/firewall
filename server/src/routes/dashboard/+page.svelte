@@ -9,10 +9,10 @@
     type: 'prompt',
     // Data
     title: 'Enter Device ID',
-    body: 'Provide the MAC address of your device below, e.g. 202111579, 202112345',
+    body: 'Provide the MAC address of your device below, e.g. 34:38:3a:45:37:3a',
     // Populates the input value and attributes
     value: '',
-    valueAttr: { type: 'text', minlength: 9, maxlength: 9, required: true },
+    valueAttr: { type: 'text', minlength: 17, maxlength: 17, required: true },
     // Returns the updated response value
     response: (r: string) => {
       addDeviceValue = r;
@@ -22,8 +22,8 @@
   
   let addDeviceValue = '';
 
-  const statusColors = ['bg-green-500', 'bg-orange-400', 'bg-firewall-red'];
-  const statusLabels = ['ON', 'OFF'];
+  const statusColors = ['bg-firewall-red', 'bg-green-500'];
+  const statusLabels = ['OFF', 'ON'];
               
   interface Device {
     name: string;
@@ -103,7 +103,7 @@
         <p class='w-min h-min'>{ device.name }</p>
         <p class='w-min h-min'>{ device.mac }</p>
       </div>
-      <button class='h-full w-1/4 { statusColors[device.status] } text-white rounded-lg' on:click={() => toggleDevice(device)}>{ statusLabels[device.status] }</button>
+      <button class='h-full w-1/4 { statusColors[Number(device.status)] } text-white rounded-lg' on:click={() => toggleDevice(device)}>{ statusLabels[Number(device.status)] }</button>
     </div>
   {/each}
 </div>
