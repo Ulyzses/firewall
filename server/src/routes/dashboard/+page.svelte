@@ -77,11 +77,11 @@
 
 <div class='grid grid-flow-row grid-cols-1 lg:grid-cols-2 gap-4 mx-6'>
   <div class='flex flex-row justify-between w-full h-min lg:col-span-2 items-center'>
-    <h1 class='text-3xl font-kollektif'>Devices</h1>
+    <h1 class='text-xl sm:text-3xl font-kollektif'>Devices</h1>
     <label for="macAddress">
       <input name="macAddress" type="hidden" bind:value={ addDeviceValue }/>
     </label>
-    <button class='border border-white bg-firewall-red p-4 rounded-lg w-40 h-min text-sm text-white font-DM hover:border-firewall-red' on:click={() => { modalStore.trigger(modalAddDevice); }}>+ Add Device</button>
+    <button class='border border-white bg-firewall-red p-2 sm:p-4 rounded-lg w-32 sm:w-40 h-min text-sm text-white font-DM hover:border-firewall-red' on:click={() => { modalStore.trigger(modalAddDevice); }}>+ Add Device</button>
   </div>
   <div class='overflow-y-scroll'>
     {#each devices as device (device.id)}
