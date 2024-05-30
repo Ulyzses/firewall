@@ -14,7 +14,7 @@
 	initializeStores();
 
 	export let data;
-	$: ({ session, supabase } = data);
+	$: ({ session, supabase, user } = data);
 
 	console.log('path', $page.url.pathname);
 
@@ -57,14 +57,14 @@
 <Modal />
 
 {#if session}
-	<nav class='grid grid-flow-row grid-cols-2 justify-between h-min w-auto mb-6 mx-6 my-4'>
+	<nav class='flex flex-row justify-between h-min w-auto mb-6 mx-6 my-4'>
 		<div class='text-2xl text-firewall-red font-kollektif'>FireWall</div>
-		<div class='text-mg text-black italic font-DM ml-auto mr-0 variant-filled' use:popup={userPopup}>
-			<span>Hello, user!</span>
-		</div>
-		<div class="card p-4 bg-gray" data-popup="userPopup">
-			<button on:click={logout}>Logout</button>
-			<div class="variant-filled-gray" />
+		<div class='text-mg text-black italic font-DM ml-auto mr-0 space-x-2'>
+			<span>
+				Hello, 
+				<span class='text-firewall-red'>{ user?.email }</span>
+				!</span>
+			<button class='bg-black hover:bg-gray-200 text-white hover:text-black w-24 p-2 rounded-lg' on:click={logout}>Logout</button>
 		</div>
 	</nav>
 {/if}

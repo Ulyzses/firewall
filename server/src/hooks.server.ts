@@ -67,7 +67,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
   // If there's a session, redirect to the home page if the user tries to go to
   // the login page
   if (event.locals.session && event.url.pathname === '/auth') {
-    return redirect(303, '/')
+    return redirect(303, '/dashboard')
   }
 
   return resolve(event)
