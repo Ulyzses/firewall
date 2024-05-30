@@ -75,7 +75,7 @@
   }
 </script>
 
-<div class='grid grid-flow-row grid-cols-1 lg:grid-cols-2 gap-4 overflow-y-scroll mx-6'>
+<div class='grid grid-flow-row grid-cols-1 lg:grid-cols-2 gap-4 mx-6'>
   <div class='flex flex-row justify-between w-full h-min lg:col-span-2 items-center'>
     <h1 class='text-3xl font-kollektif'>Devices</h1>
     <label for="macAddress">
@@ -83,25 +83,27 @@
     </label>
     <button class='border border-white bg-firewall-red p-4 rounded-lg w-40 h-min text-sm text-white font-DM hover:border-firewall-red' on:click={() => { modalStore.trigger(modalAddDevice); }}>+ Add Device</button>
   </div>
-  {#each devices as device (device.id)}
-    <div class='flex flex-row flex-none w-auto h-40 p-8 items-center bg-gray-200 rounded-lg border border-gray-200 font-DM gap-6 justify-between font-bold'>
-      <img src={ plug } alt='' class='size-28 md:size-32' />
-      <div class='basis-1/3 h-auto w-1/4 grid grid-flow-cols justify-items-left justify-self-center'>
-        <span>{ device.name }</span>
-        <span class='italic'>{ device.mac }</span>
-        <span class='text-firewall-red text-sm'>         
-          {#if device.smoke}
-            Smoke Detected!
-          {:else}
-            <br>
-          {/if}
-        </span>
+  <div class='overflow-y-scroll'>
+    {#each devices as device (device.id)}
+      <div class='flex flex-row flex-none w-auto h-40 p-8 items-center bg-gray-200 rounded-lg border border-gray-200 font-DM gap-6 justify-between font-bold'>
+        <img src={ plug } alt='' class='size-28 md:size-32' />
+        <div class='basis-1/3 h-auto w-1/4 grid grid-flow-cols justify-items-left justify-self-center'>
+          <span>{ device.name }</span>
+          <span class='italic'>{ device.mac }</span>
+          <span class='text-firewall-red text-sm'>         
+            {#if device.smoke}
+              Smoke Detected!
+            {:else}
+              <br>
+            {/if}
+          </span>
+        </div>
+        <button class='h-full w-1/4 { statusColors[Number(device.status)] } text-white rounded-lg text-center border border-gray-200 hover:border-0' on:click={() => toggleDevice(device)}>
+          <span>STATUS:</span>
+          <br>
+          <span class='font-bold'>{ statusLabels[Number(device.status)] }</span>
+        </button>
       </div>
-      <button class='h-full w-1/4 { statusColors[Number(device.status)] } text-white rounded-lg text-center border border-gray-200 hover:border-0' on:click={() => toggleDevice(device)}>
-        <span>STATUS:</span>
-        <br>
-        <span class='font-bold'>{ statusLabels[Number(device.status)] }</span>
-      </button>
-    </div>
-  {/each}
+    {/each}
+  </div>
 </div>
