@@ -1,9 +1,15 @@
-<script>
+<script lang='ts'>
 	import "../app.css";
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { initializeStores, Modal } from '@skeletonlabs/skeleton';
+	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+	import { popup } from '@skeletonlabs/skeleton';
+	import type { PopupSettings } from '@skeletonlabs/skeleton';
+	import { storePopup } from '@skeletonlabs/skeleton';
+	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+			
 
 	initializeStores();
 
@@ -39,11 +45,27 @@
 
 		goto('/auth');
 	};
+
+	const userPopup: PopupSettings = {
+		event: 'click',
+		target: 'userPopup',
+		placement: 'bottom'
+	};
+
 </script>
 
 <Modal />
 
 {#if session}
-	<button on:click={logout}>Logout</button>
+	<nav class='grid grid-flow-row grid-cols-2 justify-between h-min w-auto mb-6 mx-6 my-4'>
+		<div class='text-2xl text-firewall-red font-kollektif'>FireWall</div>
+		<div class='text-mg text-black italic font-DM ml-auto mr-0 variant-filled' use:popup={userPopup}>
+			<span>Hello, user!</span>
+		</div>
+		<div class="card p-4 bg-gray" data-popup="userPopup">
+			<button on:click={logout}>Logout</button>
+			<div class="variant-filled-gray" />
+		</div>
+	</nav>
 {/if}
 <slot />
