@@ -23,13 +23,13 @@
 					<input name="email" type="email" class='border border-gray-500 text-gray-500 p-2 text-sm rounded-lg' placeholder="Email Address" />
 					<input name="password" type="password" class='border border-gray-500 text-gray-500 text-sm p-2 rounded-lg' placeholder="Password" />
 				</div>
-				<button class='p-1 w-36 bg-firewall-red text-white rounded-lg self-center font-bold'>Log In</button>
+				<button class='border border-white p-2 w-36 bg-firewall-red text-white rounded-lg self-center font-bold hover:border-firewall-red'>Log In</button>
 			</div>
 			<div class='space-y-6 content-center flex flex-col justify-center'>
 				<button class='bg-white hover:bg-gray-200 text-black border border-gray-200 p-2 rounded-lg' formaction="?/oauth">Sign in with Google</button>
 				<div class='italic font-bold text-sm'>
 					Not registered yet?
-					<a class='text-firewall-red' href="/auth/register">Register a new account.</a>
+					<a class='text-firewall-red hover:underline' href="/auth/register">Register a new account.</a>
 				</div>
 			</div>
 		</form>	

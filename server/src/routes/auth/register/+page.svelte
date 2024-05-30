@@ -24,7 +24,7 @@
 					<input name="username" type="text" class='border border-gray-500 text-gray-500 p-2 text-sm rounded-lg' placeholder="Username"  />
 					<input name="password" type="password" class='border border-gray-500 text-gray-500 text-sm p-2 rounded-lg' placeholder="Password" />
 				</div>
-				<button class='p-1 w-36 bg-firewall-red text-white rounded-lg self-center font-bold'>Register</button>
+				<button class='border border-white p-2 w-36 bg-firewall-red text-white rounded-lg self-center font-bold hover:border-firewall-red'>Register</button>
 			</div>
 			<div class='space-y-6 content-center flex flex-col justify-center'>
 				<button class='bg-white hover:bg-gray-200 text-black border border-gray-200 p-2 rounded-lg w-72' formaction="?/oauth">Register with Google</button>
