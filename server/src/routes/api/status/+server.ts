@@ -54,17 +54,17 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 
   // Return action if any
   if (queuedAction.data) {
-    // If the device is already in the desired state, return 204 No Content
-    if ((queuedAction.data.action === "ON" && state === 1) ||
-        (queuedAction.data.action === "OFF" && state === 0)) {
-      return new Response(null, { status: 204 });
-    }
-
     const updateDevice = await supabase
       .from('devices')
       .update({ status: queuedAction.data.action === "ON" ? 1 : 0 })
       .eq('mac', macAddress)
       .eq('connected', true);
+
+    // If the device is already in the desired state, return 204 No Content
+    if ((queuedAction.data.action === "ON" && state === 1) ||
+        (queuedAction.data.action === "OFF" && state === 0)) {
+      return new Response(null, { status: 204 });
+    }
     
     if (updateDevice.error) {
       return text(`Error: ${updateDevice.error.message}`, { status: 500 });
