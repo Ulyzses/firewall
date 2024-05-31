@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ request, locals: { supabase } }) =>
   const { user, profiles: { email } } = doesExist.data;
 
   // Delete all actions with the same MAC Address
-  supabase.from('actions').delete().eq('mac', mac);
+  await supabase.from('actions').delete().eq('mac', mac);
 
   const update = await supabase
     .from('devices')
