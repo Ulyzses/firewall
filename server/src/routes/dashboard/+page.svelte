@@ -3,6 +3,7 @@
   import type { ModalSettings, ModalComponent, ModalStore } from '@skeletonlabs/skeleton';
   import plug from '$lib/assets/plug.svg';
   import addDeviceModalComponent from '$lib/components/Modal/addDevice.svelte';
+  import { SlideToggle } from '@skeletonlabs/skeleton';
 
   const modalComponent: ModalComponent = { ref: addDeviceModalComponent };
   const modalStore = getModalStore();
@@ -31,7 +32,7 @@
   let addDeviceMac = '';
   let addDeviceName= '';
 
-  const statusColors = ['bg-firewall-red', 'bg-green-500'];
+  const statusColors = ['text-firewall-red', 'text-green-500'];
   const statusLabels = ['OFF', 'ON'];
               
   interface Device {
@@ -77,7 +78,6 @@
       console.log(data);
     }
 
-    device.status = !device.status;
     devices = devices;
   }
 </script>
@@ -89,12 +89,12 @@
   </div>
   <div class='overflow-y-scroll'>
     {#each devices as device (device.id)}
-      <div class='flex flex-row flex-none w-auto h-40 p-8 items-center bg-gray-200 rounded-lg border border-gray-200 font-DM gap-6 justify-between font-bold'>
-        <img src={ plug } alt='' class='size-28 md:size-32' />
+      <div class='flex flex-row flex-none w-auto h-min pl-4 pr-2 py-4 sm:p-4 sm:p-8 text-sm sm:text-base items-center bg-gray-200 rounded-lg border border-gray-200 font-DM gap-6 justify-between font-bold'>
+        <img src={ plug } alt='' class='size-20 sm:size-24 md:size-32' />
         <div class='basis-1/3 h-auto w-1/4 grid grid-flow-cols justify-items-left justify-self-center'>
-          <span>{ device.name }</span>
-          <span class='italic'>{ device.mac }</span>
-          <span class='text-firewall-red text-sm'>         
+          <span class='text-base sm:text-lg w-full truncate'>{ device.name }</span>
+          <span class='italic w-full truncate'>{ device.mac }</span>
+          <span class='text-firewall-red text-xs sm:text-sm w-full truncate'>   
             {#if device.smoke}
               Smoke Detected!
             {:else}
@@ -102,11 +102,11 @@
             {/if}
           </span>
         </div>
-        <button class='h-full w-1/4 { statusColors[Number(device.status)] } text-white rounded-lg text-center border border-gray-200 hover:border-0' on:click={() => toggleDevice(device)}>
+        <div class='flex flex-col h-full w-1/4 text-center justify-center items-center md:text-lg'>
           <span>STATUS:</span>
-          <br>
-          <span class='font-bold'>{ statusLabels[Number(device.status)] }</span>
-        </button>
+          <span class='font-bold { statusColors[Number(device.status)] }'>{ statusLabels[Number(device.status)] }</span>
+          <SlideToggle name="slide" bind:checked={device.status} active="bg-green-500" background='bg-firewall-red' size="md" on:click={() => toggleDevice(device)} />
+          </div>
       </div>
     {/each}
   </div>
