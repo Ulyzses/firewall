@@ -20,7 +20,6 @@
 	const cBase = 'card p-4 w-modal shadow-xl space-y-4 bg-white font-DM rounded-lg';
 	const cHeader = 'text-2xl font-bold';
 	const cInput = 'p-1 rounded-lg border border-gray-500';
-	const cButton = 'p-2 rounded-lg border border-white'
 
 	const numbers = [0, 1, 2, 3, 4, 5];
 </script>
