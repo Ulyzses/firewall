@@ -35,7 +35,7 @@
     modalClasses: '!bg-white !rounded-lg',
     title: 'You cannot turn this device on.',
     body: 'This device has detected smoke and has been turned off automatically. If you want to turn this device on, please turn it on physically.',
-    buttonTextCancel: 'OK'
+    buttonTextCancel: 'Close'
   };
   
   let addDeviceMac = '';
