@@ -56,7 +56,7 @@
 
 <Modal />
 
-{#if session}
+{#if session && user}
 	<nav class='flex flex-row justify-between items-center h-min w-auto mb-6 mx-6 my-4'>
 		<div class='text-lg sm:text-2xl text-firewall-red font-kollektif'>FireWall</div>
 		<div class='flex flex-col items-center justify-end space-y-2 sm:flex-row text-xs sm:text-base text-black italic font-DM ml-auto mr-0 space-x-2'>
