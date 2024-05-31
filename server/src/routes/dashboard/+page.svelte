@@ -32,7 +32,7 @@
   const modalAlert: ModalSettings = {
     type: 'alert',
     backdropClasses: '!backdrop-blur-md',
-    modalClasses: '!bg-white !rounded-lg',
+    modalClasses: '!bg-white !rounded-lg !px-8 !py-7',
     title: 'You cannot turn this device on.',
     body: 'This device has detected smoke and has been turned off automatically. If you want to turn this device on, please turn it on physically.',
     buttonTextCancel: 'Close'
