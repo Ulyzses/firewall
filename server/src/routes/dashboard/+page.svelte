@@ -2,26 +2,34 @@
   import { getModalStore } from '@skeletonlabs/skeleton';
   import type { ModalSettings, ModalComponent, ModalStore } from '@skeletonlabs/skeleton';
   import plug from '$lib/assets/plug.svg';
+  import addDeviceModalComponent from '$lib/components/Modal/addDevice.svelte';
+
+  const modalComponent: ModalComponent = { ref: addDeviceModalComponent };
   const modalStore = getModalStore();
 
-  const modalAddDevice: ModalSettings = {
+  type formData = {
+		name: string;
+		macList: string[];
+	};
+
+  const modal: ModalSettings = {
+    type: 'component',
+    component: modalComponent,
     backdropClasses: '!backdrop-blur-md',
     modalClasses: '!bg-white',
-    type: 'prompt',
-    // Data
-    title: 'Enter Device ID',
-    body: 'Provide the MAC address of your device below, e.g. 34:38:3a:45:37:3a',
-    // Populates the input value and attributes
-    value: '',
-    valueAttr: { type: 'text', minlength: 17, maxlength: 17, required: true },
-    // Returns the updated response value
-    response: (r: string) => {
-      addDeviceValue = r;
-      addDevice();
-    }
+    title: 'Add Device',
+    response(r : formData | undefined | boolean) {
+      if (typeof(r) == 'object'){
+        addDeviceMac = r.macList.join(':');
+        addDeviceName = r.name;
+        addDevice();
+      }
+      console.log(r);
+    },
   };
   
-  let addDeviceValue = '';
+  let addDeviceMac = '';
+  let addDeviceName= '';
 
   const statusColors = ['bg-firewall-red', 'bg-green-500'];
   const statusLabels = ['OFF', 'ON'];
@@ -37,14 +45,13 @@
 
   $: ({ user, supabase, devices } = data);
 
-  let addDeviceForm: HTMLFormElement;
-
   async function addDevice() {
     const { data, error } = await supabase
       .from('devices')
       .insert({
         user: user?.id,
-        mac: addDeviceValue
+        mac: addDeviceMac,
+        name: addDeviceName
       })
       .select();
 
@@ -78,10 +85,7 @@
 <div class='grid grid-flow-row grid-cols-1 lg:grid-cols-2 gap-4 mx-6'>
   <div class='flex flex-row justify-between w-full h-min lg:col-span-2 items-center'>
     <h1 class='text-xl sm:text-3xl font-kollektif'>Devices</h1>
-    <label for="macAddress">
-      <input name="macAddress" type="hidden" bind:value={ addDeviceValue }/>
-    </label>
-    <button class='border border-white bg-firewall-red p-2 sm:p-4 rounded-lg w-32 sm:w-40 h-min text-sm text-white font-DM hover:border-firewall-red' on:click={() => { modalStore.trigger(modalAddDevice); }}>+ Add Device</button>
+    <button class='border border-white bg-firewall-red p-2 sm:p-4 rounded-lg w-32 sm:w-40 h-min text-sm text-white font-DM hover:border-firewall-red' on:click={() => { modalStore.trigger(modal); }}>+ Add Device</button>
   </div>
   <div class='overflow-y-scroll'>
     {#each devices as device (device.id)}
