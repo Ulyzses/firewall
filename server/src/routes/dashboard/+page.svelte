@@ -91,13 +91,13 @@
   }
 </script>
 
-<div class='grid grid-flow-row grid-cols-1 lg:grid-cols-2 gap-4 mx-6 overflow-y-auto'>
+<div class='grid grid-flow-row grid-cols-1 lg:grid-cols-2 gap-4 mx-6 my-0 overflow-y-auto'>
   <div class='flex flex-row justify-between w-full h-min lg:col-span-2 items-center'>
     <h1 class='text-xl sm:text-3xl font-kollektif'>Devices</h1>
     <button class='border border-white bg-firewall-red p-2 sm:p-4 rounded-lg w-32 sm:w-40 h-min text-sm text-white font-DM hover:border-firewall-red' on:click={() => { modalStore.trigger(modalAdd); }}>+ Add Device</button>
   </div>
   {#if devices.some((x) => x.smoke)}
-    <div class='flex flex-row space-x-2 justify-left items-center text-xs font-bold text-lg py-2 s-auto rounded-lg lg:col-span-2'>
+    <div class='flex flex-row space-x-2 justify-left items-center text-xs font-bold py-2 s-auto rounded-lg lg:col-span-2'>
       <span class='shrink-0 bg-firewall-red text-white text-lg w-8 h-8 rounded-full flex justify-center items-center'>!</span>
       <span class='text-firewall-red sm:text-base'>WARNING: One of your devices has detected smoke and has been turned off automatically.</span>
     </div>
@@ -125,3 +125,9 @@
     </div>
   {/each}
 </div>
+
+{#if devices.length == 0}
+  <div class='fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-500 text-center'>
+    <span class='text-lg sm:text-xl md:text-2xl'>No devices registered.</span>
+  </div>
+{/if}
