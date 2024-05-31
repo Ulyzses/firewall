@@ -82,32 +82,35 @@
   }
 </script>
 
-<div class='grid grid-flow-row grid-cols-1 lg:grid-cols-2 gap-4 mx-6'>
+<div class='grid grid-flow-row grid-cols-1 lg:grid-cols-2 gap-4 mx-6 overflow-y-auto'>
   <div class='flex flex-row justify-between w-full h-min lg:col-span-2 items-center'>
     <h1 class='text-xl sm:text-3xl font-kollektif'>Devices</h1>
     <button class='border border-white bg-firewall-red p-2 sm:p-4 rounded-lg w-32 sm:w-40 h-min text-sm text-white font-DM hover:border-firewall-red' on:click={() => { modalStore.trigger(modal); }}>+ Add Device</button>
   </div>
-  <div class='overflow-y-scroll'>
-    {#each devices as device (device.id)}
-      <div class='flex flex-row flex-none w-auto h-min pl-4 pr-2 py-4 sm:p-4 sm:p-8 text-sm sm:text-base items-center bg-gray-200 rounded-lg border border-gray-200 font-DM gap-6 justify-between font-bold'>
-        <img src={ plug } alt='' class='size-20 sm:size-24 md:size-32' />
-        <div class='basis-1/3 h-auto w-1/4 grid grid-flow-cols justify-items-left justify-self-center'>
-          <span class='text-base sm:text-lg w-full truncate'>{ device.name }</span>
-          <span class='italic w-full truncate'>{ device.mac }</span>
+  {#if devices.some((x) => x.smoke)}
+    <div class='flex flex-row space-x-2 justify-left items-center text-xs font-bold text-lg px-4 py-2 s-auto rounded-lg lg:col-span-2'>
+      <span class='shrink-0 bg-firewall-red text-white text-lg w-8 h-8 rounded-full flex justify-center items-center'>!</span>
+      <span class='text-firewall-red'>WARNING: One of your devices has detected smoke and has been turned off automatically.</span>
+    </div>
+  {/if}
+  {#each devices as device (device.id)}
+    <div class='flex flex-row flex-none w-auto h-min pl-4 pr-2 py-4 sm:p-4 sm:p-8 text-sm sm:text-base items-center bg-gray-200 rounded-lg border border-gray-200 font-DM gap-6 justify-between font-bold'>
+      <img src={ plug } alt='' class='size-20 sm:size-24 md:size-32' />
+      <div class='basis-1/3 h-auto w-1/4 grid grid-flow-cols justify-items-left justify-self-center'>
+        <span class='text-base sm:text-lg w-full truncate'>{ device.name }</span>
+        <span class='italic w-full truncate'>{ device.mac }</span>
           <span class='text-firewall-red text-xs sm:text-sm w-full truncate'>   
-            {#if device.smoke}
-              Smoke Detected!
-            {:else}
-              <br>
-            {/if}
-          </span>
-        </div>
-        <div class='flex flex-col h-full w-1/4 text-center justify-center items-center md:text-lg'>
-          <span>STATUS:</span>
-          <span class='font-bold { statusColors[Number(device.status)] }'>{ statusLabels[Number(device.status)] }</span>
-          <SlideToggle name="slide" bind:checked={device.status} active="bg-green-500" background='bg-firewall-red' size="md" on:click={() => toggleDevice(device)} />
-          </div>
+          {#if device.smoke}
+            Smoke Detected!
+          {:else}
+            <br>
+          {/if}
+        </span>
       </div>
-    {/each}
-  </div>
+      <div class='flex flex-col h-full w-1/4 text-center justify-center items-center md:text-lg'>
+        <span class='font-bold { statusColors[Number(device.status)] }'>{ statusLabels[Number(device.status)] }</span>
+        <SlideToggle name="slide" bind:checked={device.status} active="bg-green-500" background='bg-firewall-red' size="md" on:click={() => toggleDevice(device)} />
+        </div>
+    </div>
+  {/each}
 </div>
