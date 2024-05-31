@@ -90,7 +90,7 @@
   {#if devices.some((x) => x.smoke)}
     <div class='flex flex-row space-x-2 justify-left items-center text-xs font-bold text-lg px-4 py-2 s-auto rounded-lg lg:col-span-2'>
       <span class='shrink-0 bg-firewall-red text-white text-lg w-8 h-8 rounded-full flex justify-center items-center'>!</span>
-      <span class='text-firewall-red'>WARNING: One of your devices has detected smoke and has been turned off automatically.</span>
+      <span class='text-firewall-red sm:text-base'>WARNING: One of your devices has detected smoke and has been turned off automatically.</span>
     </div>
   {/if}
   {#each devices as device (device.id)}
