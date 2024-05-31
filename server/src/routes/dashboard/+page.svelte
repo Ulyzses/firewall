@@ -85,19 +85,22 @@
         console.log('devices changed', payload);
         console.log('devices', devices);
 
-        if (payload.new) {
-          // @ts-ignore
+        if (payload.eventType == 'INSERT') {
+          devices = [...devices, payload.new] as Device[];
+        } else if (payload.eventType == 'DELETE') {
+          devices = devices.filter(x => x.id != payload.old.id);
+        } else if (payload.eventType == 'UPDATE') {
           const idx = devices.findIndex((x) => x.id == payload.new.id);
-          if (idx == -1) {
-            devices = [...devices, payload.new] as Device[];
-          } else {
+
+          if (idx != -1) {
             devices[idx] = payload.new as Device;
+          } else {
+            devices = [...devices, payload.new] as Device[];
           }
         }
       }
     )
     .subscribe();
-
   });
 
   async function addDevice() {
@@ -154,18 +157,22 @@
         <span class='text-base sm:text-lg w-full truncate'>{ device.name }</span>
         <span class='italic w-full truncate'>{ device.mac }</span>
           <span class='text-firewall-red text-xs sm:text-sm w-full truncate'>   
-          {#if device.smoke}
-            Smoke Detected!
+          {#if !device.connected}
+            Device not yet connected
+          {:else if device.smoke}
+            Smoke detected!
           {:else}
             <br>
           {/if}
         </span>
       </div>
       <div class='flex flex-col h-full w-1/4 text-center justify-center items-center md:text-lg'>
+        {#if device.connected}
         <span class='font-bold { statusColors[Number(device.status)] }'>{ statusLabels[Number(device.status)] }</span>
         <button on:click={() => {if (device.smoke) {modalStore.trigger(modalAlert)}}}>
           <SlideToggle name="slide" bind:disabled={device.smoke} bind:checked={device.status} active="bg-green-500" background='bg-firewall-red' size="md" on:click={() => toggleDevice(device)} />
         </button>
+        {/if}
       </div>
     </div>
   {/each}
