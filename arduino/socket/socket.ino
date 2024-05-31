@@ -1,4 +1,4 @@
-// Last updated: May 30 2:53 PM
+// Last updated: May 31 3:52 PM
 
 // Dependencies
 #include <ESP8266WiFi.h>
@@ -20,6 +20,7 @@ const char* MQTT_SERVER = "192.168.0.7";
 const int MAIN_PORT = 1889;
 const String serverPing = "https://cs145-firewall.vercel.app/api/ping";
 const String serverActions = "https://cs145-firewall.vercel.app/api/actions";
+// const String serverActions = "https://firewall-git-fix-actions-ulyzses-projects.vercel.app/api/actions?_vercel_share=LykpJ6WCwxw9TMM0XfcfSUrvCJhCSJig";
 const String serverConnect = "https://cs145-firewall.vercel.app/api/connect";
 String serverStatus = "https://cs145-firewall.vercel.app/api/status?m=34:38:3a:45:37:3a&s=";
 const int httpsPort = 443; 
@@ -62,7 +63,7 @@ void setup(){
   pinMode(LED, OUTPUT);
   pinMode(BUTTON, INPUT_PULLUP);
   digitalWrite(LED, 0);
-  digitalWrite(RELAY, HIGH); // Initialize relay to on
+  digitalWrite(RELAY, LOW); // Initialize relay to on
 
   // wifi setup for MQTT and server
   setup_wifi();
@@ -74,8 +75,27 @@ void setup(){
   Serial.println(payload);
 
   // Check if already connected
-  payload = getData(serverStatus + (String) state);
+  payload = getData(serverStatus + (String) state + "&f=1");
   Serial.println(payload);
+
+  if(payload == "OFF"){
+    isConnected = true;
+    Serial.println("Turning off now");
+    digitalWrite(RELAY, LOW);   // Turn off relay
+    state = 0;
+    // client.publish(OUTTOPIC_SERVER, SOCKET_OFF); //send to smoke detector
+    // Serial.println(isConnected);
+  }
+
+  else if(payload == "ON"){
+    isConnected = true;
+    Serial.println("Turning on now");
+    digitalWrite(RELAY, HIGH);  // Turn on relay
+    state = 1;
+    // client.publish(OUTTOPIC_SERVER, SOCKET_ON); // send to smoke detector
+  }
+
+  client.publish(OUTTOPIC, payload.c_str());
   
   for (int i = 0; i < 6; ++i) {
     MAC += String(WiFi.macAddress()[i], 16);
@@ -152,17 +172,20 @@ void loop(){
 
   // Turn off switch either by smoke or user
   else if((inmessage_string == "011001" || payload == "OFF" || (state == 1 && debouncedReading == 1)) && (millis() - lastPressTime > pressDelay)){
-    // trigger = 0 if smoke detected, else anything else
-    int trigger = 2;
+    // trigger = 1 if smoke detected, else anything else
+    int trigger = 1;
     if(inmessage_string == "011001") trigger = 0;
-    else if(payload == "OFF") trigger = 1;
+    else if(payload == "OFF") trigger = 2;
     
     // Sending a signal to other hardware and server
     Serial.println("Turning off now");
     digitalWrite(RELAY, LOW);   // Turn off relay
     state = 0;
     client.publish(OUTTOPIC_SERVER, SOCKET_OFF); //send to smoke detector
-    if(trigger != 1){
+
+    Serial.println(trigger);
+
+    if(trigger != 2){
       String content = makeActionContent(trigger); 
       bool _ = sendToServer(content, serverActions, 0); // send to server
     }
@@ -173,16 +196,16 @@ void loop(){
 
   // Turn on switch through user or button press.
   else if(((state == 0 && debouncedReading == 1) || payload == "ON" ) && (millis() - lastPressTime > pressDelay)){
-    int trigger = 0;
-    if(payload == "ON") trigger = 1;
+    int trigger = 1;
+    if(payload == "ON") trigger = 0;
 
     Serial.println("Turning on now");
     digitalWrite(RELAY, HIGH);  // Turn on relay
     state = 1;
     client.publish(OUTTOPIC_SERVER, SOCKET_ON); // send to smoke detector
 
-    if(trigger == 0){
-      String content = makeActionContent(0);
+    if(trigger == 1){
+      String content = makeActionContent(1);
       bool _ = sendToServer(content, serverActions, 0); // send to server
     }
 
@@ -192,7 +215,7 @@ void loop(){
 }
 
 String makeActionContent(int trigger){
-  return "{\"mac\" : \"" + MAC + "\", \"trigger\" : \"" + (String) trigger + "\", \"state\" : \"" + (String) state + "\"}";
+  return "{\"mac\" : \"" + MAC + "\", \"trigger\" : " + (String) trigger + ", \"state\" : " + (String) state + "}";
 }
 
 void setup_wifi() {

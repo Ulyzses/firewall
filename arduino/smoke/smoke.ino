@@ -1,17 +1,4 @@
-// NOTES
-/*
-  1. Not sure if tama yung mga topics.
-*/
-
-/*
-  Data package:
-  Src: 2bits
-  Dest: 2bits
-  Data: 2bits
-
-  Smoke: 01, Socket: 10, Server: 11, User: 00
-  Data: 00 - OFF/NO_SMOKE, 01 - ON/SMKE
-*/
+// Last updated: May 31 3:52 PM
 
 //Dependencies
 #include <ESP8266WiFi.h>
@@ -39,8 +26,6 @@ const char* SSID = "DragonsDen";
 const char* PASSWORD = "iotcup2024fusrodah";
 const char* MQTT_SERVER = "192.168.0.7";
 const int MAIN_PORT = 1889;
-const String serverName = "https://cs145-firewall.vercel.app/api/ping";
-const int httpsPort = 443; 
 
 // MQTT Topics
 #define OUTTOPIC "cs145/Sinigang/smoke/out"           // This will be used for publishing to our own
@@ -58,6 +43,7 @@ const char* NO_SMOKE_DETECTED = "011000";
 unsigned long buzzerStart = 0;
 int buzzLength = 5000;
 int maxSound = 1000;
+bool first = true;
 
 // Global condition variables
 int outmessage_sent = 0;
@@ -67,12 +53,6 @@ void setup(){
   // Setup
   Serial.begin(115200);
 
-  // Calibrate smoke detection unit
-  // Serial.println();
-  // Serial.print("Calibrating.....");
-  // Res = SensorCalibration();
-  // printCalibration(Res);
-
   // Setup BUZZER and LED
   pinMode(BUZZER, OUTPUT);
   pinMode(LED, OUTPUT);
@@ -80,6 +60,12 @@ void setup(){
   digitalWrite(BUZZER, 0);
   digitalWrite(LED, 0);
   digitalWrite(MQT, 0);
+
+  // Calibrate smoke detection unit
+  Serial.println();
+  Serial.print("Calibrating.....");
+  Res = SensorCalibration();
+  printCalibration(Res);
 
   // wifi setup
   setup_wifi();
@@ -93,37 +79,41 @@ void loop(){
     reconnect();
   }
   client.loop();
+
+  if(first){
+    client.publish(OUTTOPIC, "FINISHED CALIBRATING");
+    first = false;
+  }
   
   Serial.println();
-  // float result = checkForSmoke();
-  int result = analogRead(SENSOR);
-  client.publish(OUTTOPIC, "");
-  // Serial.println(result);
-  // Serial.println(outmessage_sent);
+  float result = checkForSmoke();
+  // int result = analogRead(SENSOR);
+  // client.publish(OUTTOPIC, "");
+  Serial.print("result");
+  Serial.println(result);
+  String r = (String) result;
+  client.publish(OUTTOPIC, r.c_str());
 
   // Message not yet sent and Smoke detected
-  // if(outmessage_sent == 0 && result > THRESHOLD){ // FOR SMOKE SENSOR
-  if(outmessage_sent == 0 && result < 512){ // For Light SENSOR
+  if(outmessage_sent == 0 && result > THRESHOLD){ // FOR SMOKE SENSOR
+  // if(outmessage_sent == 0 && result < 512){ // For Light SENSOR
     digitalWrite(LED, 1);
     tone(BUZZER, maxSound);
     buzzerStart = millis();
     outmessage_sent = 1;
-    client.publish(OUTTOPIC_SERVER, SMOKE_DETECTED);
-    String content = "{\"content\":\"011001\"}";
-    sendToServer(content);
+
+    for(int i = 0; i < 4; i++){
+      Serial.println("Publishing");
+      client.publish(OUTTOPIC_SERVER, SMOKE_DETECTED);
+      client.publish(OUTTOPIC, "SMOKE DETECTED");
+      delay(3000);
+    }
   }
 
   // Smoke is below threshold
-  // else if(result <= THRESHOLD){
-  else if(result >= 512){
-    //  digitalWrite(LED, 0);
-    //  tone(BUZZER, 0);
+  else if(result <= THRESHOLD){
     outmessage_sent = 0;
-
-    // Smoke is below threshold and must inform socket that no more smoke
-    // if(outmessage_sent == 1){
-    //   client.publish(OUTTOPIC_SERVER, NO_SMOKE_DETECTED);
-    // }
+    client.publish(OUTTOPIC, "NO SMOKE DETECTED");
   }
 
   // Smoke is detected and message already sent
@@ -219,7 +209,7 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish(OUTTOPIC, "connected");
+      client.publish(OUTTOPIC, "sensor is connected to mqtt");
       // ... and resubscribe
       client.subscribe(INTOPIC);
       digitalWrite(MQT, 1);
@@ -245,34 +235,5 @@ void callback(char* topic, byte* payload, unsigned int length){
   if(inmessage_string == "100001"){
     digitalWrite(BUZZER, 0);
     digitalWrite(LED, 0);
-  }
-}
-
-void sendToServer(String content){
-  if(WiFi.status()== WL_CONNECTED){
-    WiFiClientSecure client;
-    HTTPClient http;
-
-    digitalWrite(LED, 0);
-    client.setInsecure(); //the magic line, use with caution
-    client.connect(serverName, httpsPort);
-
-    // Your Domain name with URL path or IP address with path
-    http.begin(client, serverName);
-
-    // If you need an HTTP request with a content type: application/json, use the following:
-    http.addHeader("Content-Type", "application/json");
-    int httpResponseCode = http.POST(content);
-    
-    Serial.print("HTTP Response code: ");
-    Serial.println(httpResponseCode);
-
-    String payload = http.getString();   //Get the request response payload
-    Serial.println(payload);  
-      
-    // Free resources
-    http.end();
-
-    digitalWrite(LED, 1);
   }
 }
