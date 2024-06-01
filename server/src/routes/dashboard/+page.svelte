@@ -82,8 +82,8 @@
     .on('postgres_changes',
       { event: '*', schema: 'public', table: 'devices' },
       (payload) => {
-        console.log('devices changed', payload);
-        console.log('devices', devices);
+        // @ts-ignore
+        if (payload.new.user != user?.id) return;
 
         if (payload.eventType == 'INSERT') {
           devices = [...devices, payload.new] as Device[];
