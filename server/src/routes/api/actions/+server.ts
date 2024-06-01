@@ -68,16 +68,33 @@ export const POST: RequestHandler = async ({ request, locals: { supabase } }) =>
     },
   })
 
+  let alertSubject = '';
+  let alertHtml = '';
+
+  const { name } = doesExist.data;
+  const time = (new Date()).toLocaleString();
+
+  if (isSmoke) {
+    alertSubject = `FireWall Alert: Smoke Detected by ${name}`;
+    alertHtml = `
+    <p>Smoke was detected by <strong>${name}</strong> (${mac}) on ${time}.</p>
+    <p>We turned it off for you automatically; to turn it on, please use the button on your socket.</p>
+    <hr>
+    <small>This is an automatically generated message.</small>`
+  } else {
+    alertSubject = `FireWall Notification: ${name} ${isOn ? 'Turned ON' : 'Turned OFF'}`;
+    alertHtml = `
+    <p><strong>${name}</strong> (${mac}) was toggled ${isOn ? 'ON' : 'OFF'} on ${time}.</p>
+    <hr>
+    <small>This is an automatically generated message.</small>
+    `
+  }
+
   const info = await transport.sendMail({
+    from: `"FireWall" <${PUBLIC_NODEMAILER_USER}>`,
     to: email,
-    subject: "FireWall Alert",
-    html: `
-      <h1>FireWall Alert</h1>
-      <p>Device: ${doesExist.data.name}</p>
-      <p>MAC Address: ${mac}</p>
-      <p>Trigger: ${isSmoke ? 'Smoke' : 'Manual'}</p>
-      <p>State: ${state}</p>
-    `,
+    subject: alertSubject,
+    html: alertHtml,
   });
 
   console.log("Message sent: %s", info.messageId);
